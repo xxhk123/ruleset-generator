@@ -43,4 +43,15 @@ cat ruleset.srs
 
 # 确保生成了正确的文件并将其添加到 Git
 git status
-echo "ruleset.json and ruleset.srs have been generated."
+
+# 添加文件到暂存区
+git add ruleset.json ruleset.srs
+
+# 检查是否有更改需要提交
+if git diff --staged --quiet; then
+  echo "No changes to commit"
+  exit 0
+else
+  git commit -m "Update ruleset.json and ruleset.srs"
+  git push
+fi
