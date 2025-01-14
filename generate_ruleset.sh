@@ -13,12 +13,13 @@ echo '{
 
 # 将 china.txt 中的每行转换为符合 CIDR 格式的数组项
 # 确保每个 CIDR 地址没有多余的空格和换行
-awk '{gsub(/^[[:space:]]+|[[:space:]]+$/, ""); if(NF > 0) print "        \"" $0 "\""}' china.txt >> ruleset.json
+awk '{gsub(/^[[:space:]]+|[[:space:]]+$/, ""); if(NF > 0) print "        \"" $0 "\""}' china.txt | sed '/^$/d' >> ruleset.json
 
 # 删除最后一行的逗号，关闭 JSON 数组和对象
-# 使用 'head' 和 'tail' 删除多余的逗号
+# 使用 head 命令删除最后一行的逗号
 head -n -1 ruleset.json > temp.json && mv temp.json ruleset.json
 
+# 添加闭合的 JSON 语法
 echo '
       ]
     }
