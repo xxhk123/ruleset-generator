@@ -1,0 +1,31 @@
+name: Generate SingBox Ruleset
+
+on:
+  schedule:
+    - cron: '45 2 * * *'  # 每天 UTC 2:45 执行
+  workflow_dispatch:  # 允许手动触发
+  push:
+    branches:
+      - main  # 监听 main 分支的推送
+
+jobs:
+  generate-ruleset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up script
+        run: |
+          chmod +x generate_ruleset.sh
+          
+      - name: Generate ruleset
+        run: ./generate_ruleset.sh
+
+      - name: Commit and push the generated ruleset
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add ruleset.json
+          git commit -m "Update ruleset.json"
+          git push origin main
