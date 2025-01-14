@@ -27,3 +27,23 @@ echo '
 }' >> ruleset.json
 
 echo "ruleset.json has been generated."
+
+# 以下是将更改提交到 Git 仓库的部分
+
+# 配置 Git
+git config --global user.email "action@github.com"
+git config --global user.name "GitHub Actions"
+
+# 添加所有修改的文件（包括新下载的 china.txt）
+git add ruleset.json
+git add china.txt
+git add generate_ruleset.sh
+
+# 检查是否有修改，如果有修改则提交
+if git diff --staged --quiet; then
+  echo "No changes to commit"
+  exit 0
+else
+  git commit -m "Update ruleset.json"
+  git push
+fi
