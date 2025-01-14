@@ -11,13 +11,10 @@ echo '{
     {
       "ip_cidr": [' > ruleset.json
 
-# 将 china.txt 中的每行转换为符合 CIDR 格式的数组项
-awk '{ print "        \"" $0 "\"," }' china.txt >> ruleset.json
+# 将 china.txt 中的每行转换为符合 CIDR 格式的数组项，并去掉末尾的逗号
+awk '{ print "        \"" $0 "\"" }' china.txt >> ruleset.json
 
 # 删除最后一行多余的逗号，并关闭 JSON 数组和对象
-sed -i '$ s/,$//' ruleset.json
-
-# 结束 JSON 格式
 echo '
       ]
     }
