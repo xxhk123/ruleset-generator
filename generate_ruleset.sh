@@ -18,6 +18,7 @@ awk '{ print "  \"" $0 "\"," }' china.txt >> ruleset.json
 sed -i '$ s/,$//' ruleset.json
 echo ']
 }
+]
 }' >> ruleset.json
 
 echo "ruleset.json has been generated."
