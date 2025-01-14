@@ -26,10 +26,21 @@ echo '      ]
   ]
 }' >> ruleset.json
 
+# 生成 SingBox SRS 文件
+echo "# SingBox Ruleset" > ruleset.srs
+
+# 将 china.txt 中的每行添加到 .srs 文件，每行格式为 "IP_CIDR"
+awk '{gsub(/^[[:space:]]+|[[:space:]]+$/, ""); if(NF > 0) print $0}' china.txt | \
+# 添加 "IP_CIDR" 前缀并格式化
+awk '{print "IP_CIDR " $0}' >> ruleset.srs
+
 # 打印文件内容检查
 echo "Generated ruleset.json content:"
 cat ruleset.json
 
+echo "Generated SingBox ruleset.srs content:"
+cat ruleset.srs
+
 # 确保生成了正确的文件并将其添加到 Git
 git status
-echo "ruleset.json has been generated."
+echo "ruleset.json and ruleset.srs have been generated."
