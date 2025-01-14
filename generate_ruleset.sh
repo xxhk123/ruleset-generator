@@ -1,29 +1,23 @@
 #!/bin/bash
 
 # 下载 china.txt 文件
-curl -O https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china.txt
+china_txt_url="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china.txt"
+curl -s -o china.txt "$china_txt_url"
 
-# 检查 china.txt 是否存在
-if [ ! -f "china.txt" ]; then
-  echo "china.txt file not found!"
-  exit 1
-fi
+# 处理 china.txt 文件，生成 ruleset.json
+echo '{
+  "version": 1,
+  "rules": [
+    {
+      "ip_cidr": [' > ruleset.json
 
-# 开始构建 ruleset 文件
-echo "{
-  \"rules\": [" > ruleset.json
+# 将 china.txt 中的每行转换为符合 CIDR 格式的数组项
+awk '{ print "  \"" $0 "\"," }' china.txt >> ruleset.json
 
-# 逐行读取 china.txt 中的 IP-CIDR 格式数据
-while IFS= read -r line; do
-  # 跳过空行和注释行
-  if [[ -z "$line" || "$line" == \#* ]]; then
-    continue
-  fi
-  # 将每个 CIDR 地址加入规则
-  echo "    {\"IP-CIDR\": \"$line\"}," >> ruleset.json
-done < "china.txt"
+# 删除最后一行多余的逗号，并关闭 JSON 数组和对象
+sed -i '$ s/,$//' ruleset.json
+echo ']
+}
+}' >> ruleset.json
 
-# 关闭 JSON 数组
-echo "  ]" >> ruleset.json
-
-echo "Ruleset generated: ruleset.json"
+echo "ruleset.json has been generated."
