@@ -21,8 +21,7 @@ awk '{print $0 ","}' >> ruleset.json
 sed -i '$ s/,$//' ruleset.json
 
 # 添加闭合的 JSON 语法
-echo '
-      ]
+echo '      ]
     }
   ]
 }' >> ruleset.json
