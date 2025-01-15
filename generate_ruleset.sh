@@ -30,6 +30,20 @@ echo '      ]
 echo "Generated ruleset.json content:"
 cat ruleset.json
 
-# 确保生成了正确的文件并将其添加到 Git
-git status
-echo "ruleset.json has been generated."
+# 检查文件是否存在
+if [ -f "ruleset.json" ]; then
+  echo "ruleset.json exists."
+  # 使用 git diff 检查文件是否有修改
+  if git diff --quiet ruleset.json; then
+    echo "ruleset.json has no changes."
+    # 强制覆盖文件，先备份原文件（可选）
+    #cp ruleset.json ruleset.json.backup
+    # 使用 git checkout 将文件重置为上一次提交的状态，这相当于覆盖文件
+    git checkout -- ruleset.json
+    echo "ruleset.json has been overwritten."
+  else
+    echo "ruleset.json has changes."
+  fi
+else
+  echo "ruleset.json does not exist."
+fi
