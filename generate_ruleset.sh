@@ -4,6 +4,11 @@
 china_txt_url="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china.txt"
 curl -s -o china.txt "$china_txt_url"
 
+if [ $? -ne 0 ]; then
+  echo "Failed to download china.txt. Exiting."
+  exit 1
+fi
+
 # 生成 ruleset.json 文件
 echo '{
   "version": 1,
