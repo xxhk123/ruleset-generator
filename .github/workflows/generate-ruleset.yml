@@ -24,13 +24,19 @@ jobs:
       - name: Generate ruleset
         run: ./generate_ruleset.sh
 
-
-      - name: Commit and push the generated ruleset
+          - name: Commit and push the generated ruleset
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+
+          # 添加更新后的 china.txt 和 ruleset.json 到暂存区
+          git add china.txt ruleset.json
           
-          # 强制提交，即使没有实际更改
-          git add ruleset.json
-          git commit --allow-empty -m "Update ruleset.json"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          # 检查是否有任何文件发生变化
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update ruleset.json and china.txt"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          fi
+
