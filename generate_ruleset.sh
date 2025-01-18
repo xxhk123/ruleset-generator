@@ -52,3 +52,51 @@ if [ -f "ruleset.json" ]; then
 else
   echo "ruleset.json does not exist."
 fi
+
+# ------------------------------
+# 以下部分是新添加的功能，用于处理你提供的规则列表
+# ------------------------------
+
+# 假设你要处理的规则文件是直接给定的一个 URL
+rules_url="https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/direct-list.txt"
+curl -s -o rules.txt "$rules_url"
+
+if [ $? -ne 0 ]; then
+  echo "Failed to download rules.txt. Exiting."
+  exit 1
+fi
+
+# 生成 singbox 的规则文件
+singbox_ruleset="singbox-ruleset.txt"
+
+echo "Converting direct-list.txt to singbox ruleset format..."
+
+# 生成 singbox-ruleset.txt
+echo "// Singbox ruleset" > "$singbox_ruleset"
+echo "// Auto-generated from direct-list.txt" >> "$singbox_ruleset"
+echo "" >> "$singbox_ruleset"
+
+# 假设文件中的内容是域名和正则表达式，转换为 singbox 格式
+while read -r line; do
+  line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')  # 去除空格
+  if [[ -z "$line" || "$line" == \#* ]]; then
+    continue  # 忽略空行和注释行
+  fi
+
+  # 处理规则并转换为 singbox 规则
+  if [[ "$line" =~ ^full.* ]]; then
+    # 处理 full 域名规则
+    echo "DOMAIN,${line#full},Direct" >> "$singbox_ruleset"
+  elif [[ "$line" =~ ^.*\..*\..* ]]; then
+    # 处理普通域名
+    echo "DOMAIN-KEYWORD,$line,Direct" >> "$singbox_ruleset"
+  elif [[ "$line" =~ ^/.*\/ ]]; then
+    # 处理正则表达式
+    echo "DOMAIN-REGEX,$line,Direct" >> "$singbox_ruleset"
+  fi
+done < rules.txt
+
+echo "Converted to singbox ruleset format."
+cat "$singbox_ruleset"
+
+# 结束
