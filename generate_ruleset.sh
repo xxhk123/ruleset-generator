@@ -56,6 +56,7 @@ fi
 # ------------------------------
 # 以下部分是新添加的功能，用于处理你提供的规则列表
 # ------------------------------
+
 # 假设你要处理的规则文件是直接给定的一个 URL
 rules_url="https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/direct-list.txt"
 curl -s -o rules.txt "$rules_url"
@@ -85,20 +86,33 @@ while read -r line; do
   # 调试输出，查看每一行
   # echo "Processing line: $line"
 
-  # 处理规则并转换为 singbox 规则
+  # 处理 full 域名规则
   if [[ "$line" =~ ^full.* ]]; then
-    # 处理 full 域名规则
-    echo "DOMAIN,${line#full},Direct" >> "$singbox_ruleset"
-  elif [[ "$line" =~ ^.*\..*\..* ]]; then
-    # 处理普通域名
-    echo "DOMAIN-KEYWORD,$line,Direct" >> "$singbox_ruleset"
-  elif [[ "$line" =~ ^/.*\/ ]]; then
-    # 处理正则表达式
+    # 处理 full 域名规则：去掉 'full' 前缀
+    domain="${line#full}"
+    echo "DOMAIN,$domain,Direct" >> "$singbox_ruleset"
+  
+  # 处理普通的域名规则
+  elif [[ "$line" =~ ^([a-zA-Z0-9.-]+)$ ]]; then
+    domain="$line"
+    echo "DOMAIN-KEYWORD,$domain,Direct" >> "$singbox_ruleset"
+
+  # 处理带冒号的域名（例如：域名:端口）
+  elif [[ "$line" =~ ^([a-zA-Z0-9.-]+):([0-9]+)$ ]]; then
+    domain="${line%%:*}"  # 获取域名
+    echo "DOMAIN-KEYWORD,$domain,Direct" >> "$singbox_ruleset"
+
+  # 处理正则表达式规则
+  elif [[ "$line" =~ ^/.*\/$ ]]; then
     echo "DOMAIN-REGEX,$line,Direct" >> "$singbox_ruleset"
+
   else
-    # 处理意外的格式
-    echo "UNKNOWN, $line" >> "$singbox_ruleset"
+    # 如果没有匹配到以上规则，则忽略
+    # 可以选择输出一些调试信息查看这些行为何不匹配
+    # echo "Skipping line: $line"
+    continue
   fi
+
 done < rules.txt
 
 echo "Converted to singbox ruleset format."
