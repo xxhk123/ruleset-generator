@@ -56,7 +56,6 @@ fi
 # ------------------------------
 # 以下部分是新添加的功能，用于处理你提供的规则列表
 # ------------------------------
-
 # 假设你要处理的规则文件是直接给定的一个 URL
 rules_url="https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/direct-list.txt"
 curl -s -o rules.txt "$rules_url"
@@ -83,6 +82,9 @@ while read -r line; do
     continue  # 忽略空行和注释行
   fi
 
+  # 调试输出，查看每一行
+  # echo "Processing line: $line"
+
   # 处理规则并转换为 singbox 规则
   if [[ "$line" =~ ^full.* ]]; then
     # 处理 full 域名规则
@@ -93,10 +95,11 @@ while read -r line; do
   elif [[ "$line" =~ ^/.*\/ ]]; then
     # 处理正则表达式
     echo "DOMAIN-REGEX,$line,Direct" >> "$singbox_ruleset"
+  else
+    # 处理意外的格式
+    echo "UNKNOWN, $line" >> "$singbox_ruleset"
   fi
 done < rules.txt
 
 echo "Converted to singbox ruleset format."
 cat "$singbox_ruleset"
-
-# 结束
