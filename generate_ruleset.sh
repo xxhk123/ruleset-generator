@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # 下载 china.txt 文件
-china_txt_url="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china.txt"
+#china_txt_url="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china.txt"
+china_txt_url="https://ispip.clang.cn/all_cn_cidr.txt"
 curl -s -o china.txt "$china_txt_url"
 
 if [ $? -ne 0 ]; then
